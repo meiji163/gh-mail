@@ -11,7 +11,10 @@ import (
 	"os"
 )
 
-var MaxMsg2048 int = 190
+const (
+	MaxMsg2048 int = 190
+	MaxMsg4096 int = 446
+)
 
 var InvalidPEMError error = errors.New("Invalid PEM")
 

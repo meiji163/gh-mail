@@ -14,7 +14,7 @@ func NewCmdKeygen() *cobra.Command {
 		Use:   "keygen",
 		Short: "generate encryption keys",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			priv, pub := encrypt.GenerateKeys(2048)
+			priv, pub := encrypt.GenerateKeys(4096)
 			extPath := filepath.Join(util.ExtensionsDir(), "gh-mail")
 			privPath := filepath.Join(extPath, "private.pem")
 			pubPath := filepath.Join(extPath, "public.pem")
