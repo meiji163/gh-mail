@@ -17,7 +17,7 @@ type SendOptions struct {
 	doEncrypt bool
 }
 
-func newCmdSend() *cobra.Command {
+func NewCmdSend() *cobra.Command {
 	opts := &SendOptions{
 		Host:      "github.com",
 		doEncrypt: true,
@@ -26,15 +26,16 @@ func newCmdSend() *cobra.Command {
 		Use:   "send",
 		Short: "send a message",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return SendRun(opts)
+			return sendRun(opts)
 		},
 	}
-	cmd.Flags().StringVarP(&opts.Recipient, "r", "recipient", "", "user to send to")
-	cmd.Flags().StringVarP(&opts.Title, "t", "title", "", "title of message")
+	cmd.Flags().StringVarP(&opts.Recipient, "recipient", "r", "", "user to send to")
+	cmd.Flags().StringVarP(&opts.Title, "title", "t", "", "title of message")
+	cmd.Flags().StringVarP(&opts.Body, "body", "b", "", "body of message")
 	return cmd
 }
 
-func SendRun(opt *SendOptions) error {
+func sendRun(opt *SendOptions) error {
 	pub, err := GetPublicKey(opt.Recipient, opt.Host)
 	if err != nil {
 		return err

@@ -11,12 +11,12 @@ import (
 	"os"
 )
 
-var MaxMsgBytes int = 190
+var MaxMsg2048 int = 190
 
 var InvalidPEMError error = errors.New("Invalid PEM")
 
-func GenerateKeys() (*rsa.PrivateKey, *rsa.PublicKey) {
-	priv, _ := rsa.GenerateKey(rand.Reader, 2048)
+func GenerateKeys(bits int) (*rsa.PrivateKey, *rsa.PublicKey) {
+	priv, _ := rsa.GenerateKey(rand.Reader, bits)
 	pub := &priv.PublicKey
 	return priv, pub
 }
@@ -29,14 +29,14 @@ func Decrypt(cipher []byte, priv *rsa.PrivateKey) ([]byte, error) {
 	return priv.Decrypt(nil, cipher, &rsa.OAEPOptions{Hash: crypto.SHA256})
 }
 
-// WritePrivateKeyPEM writes RSA public key to pem file
+// WritePublicKeyPEM writes RSA public key to pem file
 func WritePublicKeyPEM(pub *rsa.PublicKey, fileName string) error {
 	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0444)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func WritePublicKeyPEM(pub *rsa.PublicKey, fileName string) error {
 
 // WritePrivateKeyPEM writes RSA private key to pem file
 func WritePrivateKeyPEM(priv *rsa.PrivateKey, fileName string) error {
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0400)
 	if err != nil {
 		return err
 	}
@@ -101,4 +101,9 @@ func EncodeMsg(msg []byte, msgType string) []byte {
 		Headers: map[string]string{"Encoding": msgType},
 		Bytes:   msg,
 	})
+}
+
+func DecodeMsg(msg []byte) *pem.Block {
+	block, _ := pem.Decode(msg)
+	return block
 }

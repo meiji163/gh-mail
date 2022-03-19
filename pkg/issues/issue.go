@@ -10,15 +10,15 @@ import (
 	"github.com/cli/go-gh/pkg/api"
 )
 
-type Author struct {
-	Login string `json: "login"`
+type User struct {
+	Login string `json:"login"`
 }
 
 type Issue struct {
 	Title     string    `json:"title"`
 	Body      string    `json:"body"`
 	State     string    `json:"state"`
-	Author    Author    `json:"author,omitempty"`
+	User      User      `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -37,4 +37,18 @@ func CreateIssue(issue *Issue, user, repo string) error {
 	reqBody := bytes.NewBuffer(issueJson)
 	return client.Post(
 		fmt.Sprintf("repos/%s/%s/issues", user, repo), reqBody, nil)
+}
+
+func GetIssues(user, repo string) ([]*Issue, error) {
+	client, err := gh.RESTClient(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	issues := []*Issue{}
+	err = client.Get(fmt.Sprintf("repos/%s/%s/issues?per_page=100", user, repo), &issues)
+	if err != nil {
+		return nil, err
+	}
+	return issues, nil
 }
